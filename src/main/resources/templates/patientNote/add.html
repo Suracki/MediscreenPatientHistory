@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8"/>
+	<title>Add Patient Note</title>
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+
+	<div class="row">
+		<h2>Add Patient Note</h2>
+	</div>
+
+	<div class="row">
+		<form action="#" th:action="@{/patient/note/validate}" th:object="${patientNote}" method="post" class="form-horizontal" style="width: 100%">
+			<div class="form-group">
+				<label for="patId" class="col-sm-2 control-label">Patient ID</label>
+				<div class="col-sm-10">
+					<input type=text th:field="*{patId}" id="patId" placeholder="1" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('patId')}" th:errors="*{patId}"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="note" class="col-sm-2 control-label">Note</label>
+				<div class="col-sm-10">
+					<input type="text" th:field="*{note}" id="note" placeholder="Note" class="col-4">
+					<p class="text-danger" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></p>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-12">
+					<a class="btn btn-danger btn-sm" href="/patient/note/list">Cancel</a>
+					<input class="btn btn-primary btn-sm" type="submit" value="Add note to patient history">
+				</div>
+			</div>
+
+		</form>
+	</div>
+
+</div>
+</body>
+</html>

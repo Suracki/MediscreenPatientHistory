@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Document
 public class PatientNote implements DomainElement {
@@ -13,8 +14,10 @@ public class PatientNote implements DomainElement {
     private String patientNoteId;
     @Indexed
     @NotNull
-    private Integer patId;
-    @NotEmpty
+    @Pattern(regexp = "^\\d+$",
+    message="Patient ID must be an Integer value")
+    private String patId;
+    @NotEmpty(message="Note is mandatory")
     private String note;
 
     public String getPatientNoteId() {
@@ -33,11 +36,11 @@ public class PatientNote implements DomainElement {
         this.patientNoteId = patientNoteId;
     }
 
-    public int getPatId() {
+    public String getPatId() {
         return patId;
     }
 
-    public void setPatId(int patId) {
+    public void setPatId(String patId) {
         this.patId = patId;
     }
 

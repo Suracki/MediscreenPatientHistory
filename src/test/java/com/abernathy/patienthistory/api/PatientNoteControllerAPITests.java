@@ -47,7 +47,7 @@ public class PatientNoteControllerAPITests {
     public void patientNoteControllerAPIAddsEntry() throws Exception {
 
         PatientNote patientNote = new PatientNote();
-        patientNote.setPatId(1);
+        patientNote.setPatId("1");
         patientNote.setNote("Test Note");
 
         ObjectMapper mapper = new ObjectMapper();
@@ -70,7 +70,7 @@ public class PatientNoteControllerAPITests {
     public void patientNoteControllerAPIWillNotAddInvalidEntry() throws Exception {
 
         PatientNote patientNote = new PatientNote();
-        patientNote.setPatId(1);
+        patientNote.setPatId("1");
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
