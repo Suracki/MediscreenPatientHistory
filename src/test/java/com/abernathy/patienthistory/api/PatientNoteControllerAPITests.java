@@ -18,12 +18,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(SpringExtension.class)
@@ -86,6 +89,75 @@ public class PatientNoteControllerAPITests {
         //Verify entry is not added to DB, and we get failed response (400)
         assertTrue(mvcResult.getResponse().getStatus() == 400);
         Mockito.verify(patientNoteRepository, Mockito.times(0)).save(any(PatientNote.class));
+    }
+
+    @Test
+    public void patientNoteControllerAPIGetsEntry() throws Exception {
+
+        //Create mock patient note
+        PatientNote patientNote = new PatientNote();
+        patientNote.setPatientNoteId("TESTID");
+        patientNote.setPatId("1");
+        patientNote.setNote("TEST NOTE");
+
+        //If our service works and asks the repo for patient note with id TESTID, return our mock patient note
+        when(patientNoteRepository.findById("TESTID")).thenReturn(java.util.Optional.of(patientNote));
+
+        //Attempt to retrieve patient note
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/api/get/TESTID")
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        //Verify entry is retrieved from DB, and we get success response (200)
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).findById("TESTID");
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIDoesNotGetInvalidEntry() throws Exception {
+
+        //Attempt to retrieve patient note
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/api/get/1")
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        //Verify retrieval is attempted from DB, and we get Not Found response (404)
+        assertTrue(mvcResult.getResponse().getStatus() == 404);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).findById("1");
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIGetsAllNotesForPatient() throws Exception {
+
+        //Create mock patient notes
+        List<PatientNote> notes = new ArrayList<>();
+        notes.add(new PatientNote());
+        notes.add(new PatientNote());
+
+        //If our service works and asks the repo for notes from patient with id 1, return our mock patient notes
+        when(patientNoteRepository.findAllByPatId(1)).thenReturn(notes);
+
+        //Attempt to retrieve patient notes
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/api/getbypatient/1")
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        //Verify entry is retrieved from DB, and we get success response (200)
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).findAllByPatId(1);
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIInformsWhenPatientHasNoNotes() throws Exception {
+
+        //Attempt to retrieve patient notes
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/api/getbypatient/7")
+                .accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        //Verify retrieval is attempted from DB, and we get Not Found response (404)
+        assertTrue(mvcResult.getResponse().getStatus() == 404);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).findAllByPatId(7);
+
     }
 
 }

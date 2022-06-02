@@ -20,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(SpringExtension.class)
@@ -72,6 +73,15 @@ public class PatientNoteControllerUITests {
         //Verify no entry is added to DB and we remain on add form (200)
         assertTrue(mvcResult.getResponse().getStatus() == 200);
         Mockito.verify(patientNoteRepository, Mockito.times(0)).save(any(PatientNote.class));
+    }
+
+    @Test
+    public void patientNoteControllerGetViewPatientNotePage() throws Exception {
+
+        when(patientNoteRepository.findById("TESTID")).thenReturn(java.util.Optional.of(new PatientNote()));
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/view/TESTID").accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
     }
 
 }
