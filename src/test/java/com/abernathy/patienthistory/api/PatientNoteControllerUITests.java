@@ -18,6 +18,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -80,6 +83,15 @@ public class PatientNoteControllerUITests {
 
         when(patientNoteRepository.findById("TESTID")).thenReturn(java.util.Optional.of(new PatientNote()));
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/view/TESTID").accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+    }
+
+    @Test
+    public void patientNoteControllerGetViewAllPatientNotePage() throws Exception {
+
+        when(patientNoteRepository.findAllByPatId(1)).thenReturn(new ArrayList<>());
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/viewall/1").accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertTrue(mvcResult.getResponse().getStatus() == 200);
     }
