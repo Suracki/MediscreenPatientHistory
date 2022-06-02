@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>View Patient Note</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h2>View Patient Note</h2>
+    </div>
+
+    <div class="row">
+        <form action="#" class="form-horizontal" style="width: 100%">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><h4>Patient Note ID:</h4></label>
+                <td style="width: 10%" th:text="${currentPatientNote.patientNoteId}" class="col-4"></td>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><h4>Patient ID:</h4></label>
+                <td style="width: 10%" th:text="${currentPatientNote.patId}" class="col-4"></td>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label"><h4>Note:</h4></label>
+                <td style="width: 10%" th:text="${currentPatientNote.note}" class="col-4"></td>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <a class="btn btn-danger btn-sm" href="/patient/note/list">Back</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</body>
+</html>

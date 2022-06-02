@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -25,6 +22,13 @@ public class PatientNoteController {
     private static final Logger logger = LogManager.getLogger("PatientNoteController");
 
     //Endpoints for serving front end
+    @RequestMapping("/patient/note/list")
+    public String home(Model model)
+    {
+        logger.info("User connected to /patient/note/list endpoint");
+        return patientNoteService.home(model);
+    }
+
     @GetMapping("/patient/note/add")
     public String addPatientNote(PatientNote patientNote) {
         logger.info("User connected to /patient/note/add endpoint");
@@ -41,6 +45,11 @@ public class PatientNoteController {
     public String viewPatientNote(@PathVariable("id") String id, Model model) {
         logger.info("User connected to /patient/note/view endpoint with id " + id);
         return patientNoteService.view(id, model);
+    }
+    @GetMapping("/patient/note/viewall/{id}")
+    public String viewAllOnePatientNotes(@PathVariable("id") int id, Model model) {
+        logger.info("User connected to /patient/note/viewall endpoint with id " + id);
+        return patientNoteService.viewByPatientId(id, model);
     }
 
     //Endpoints for serving REST API
