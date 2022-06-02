@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -25,7 +26,7 @@ public class PatientNoteController {
 
     //Endpoints for serving front end
     @GetMapping("/patient/note/add")
-    public String addPatient(PatientNote patientNote) {
+    public String addPatientNote(PatientNote patientNote) {
         logger.info("User connected to /patient/note/add endpoint");
         return patientNoteService.addForm(patientNote);
     }
@@ -36,11 +37,29 @@ public class PatientNoteController {
         return patientNoteService.validate(patientNote,result,model);
     }
 
+    @GetMapping("/patient/note/view/{id}")
+    public String viewPatientNote(@PathVariable("id") String id, Model model) {
+        logger.info("User connected to /patient/note/view endpoint with id " + id);
+        return patientNoteService.view(id, model);
+    }
+
     //Endpoints for serving REST API
     @PostMapping("/patient/note/api/add")
-    public ResponseEntity<String> addPatientApi(@Valid @RequestBody PatientNote patientNote, BindingResult result, Model model) {
+    public ResponseEntity<String> addPatientNoteApi(@Valid @RequestBody PatientNote patientNote, BindingResult result, Model model) {
         logger.info("User connected to /patient/note/api/add endpoint");
         return patientNoteService.addFromApi(patientNote, result, model);
+    }
+
+    @GetMapping("/patient/note/api/get/{id}")
+    public ResponseEntity<String> getPatientNoteApi(@PathVariable("id") String id, Model model) {
+        logger.info("User connected to /patient/note/get endpoint with id " + id);
+        return patientNoteService.getFromApi(id, model);
+    }
+
+    @GetMapping("/patient/note/api/getbypatient/{patId}")
+    public ResponseEntity<String> getAllOnePatientNotesApi(@PathVariable("patId") int patId, Model model) {
+        logger.info("User connected to /patient/note/api/getbypatient endpoint with id " + patId);
+        return patientNoteService.getFromApiByPatientId(patId, model);
     }
 
 }
