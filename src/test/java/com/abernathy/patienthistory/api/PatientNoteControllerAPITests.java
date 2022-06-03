@@ -22,12 +22,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -157,6 +159,95 @@ public class PatientNoteControllerAPITests {
         //Verify retrieval is attempted from DB, and we get Not Found response (404)
         assertTrue(mvcResult.getResponse().getStatus() == 404);
         Mockito.verify(patientNoteRepository, Mockito.times(1)).findAllByPatId(7);
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIUpdatesEntry() throws Exception {
+
+        //Create mock note with valid data
+        PatientNote note = new PatientNote();
+        note.setPatientNoteId("NOTEID");
+        note.setPatId("1");
+        note.setNote("NOTE");
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson=ow.writeValueAsString(note);
+
+        //If our service accepts the PatientNote JSON and asks the repo for patient with id NOTEID, return a valid patient
+        when(patientNoteRepository.findById("NOTEID")).thenReturn(java.util.Optional.of(note));
+
+        //Attempt to update note
+        MvcResult mvcResult = mockMvc.perform(
+                put("/patient/note/api/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .accept(MediaType.ALL)).andReturn();
+
+        //Verify entry is saved to DB, and we get success response (200)
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).save(any());
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIDoesNotUpdateWithInvalidData() throws Exception {
+
+        //Create mock note with valid ID but invalid/missing data
+        PatientNote note = new PatientNote();
+        note.setPatientNoteId("NOTEID");
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson=ow.writeValueAsString(note);
+
+        //If our service accepts the Patient JSON and asks the repo for patient with id NOTEID, return a valid patient
+        when(patientNoteRepository.findById("NOTEID")).thenReturn(java.util.Optional.of(note));
+
+        //Attempt to update note
+        MvcResult mvcResult = mockMvc.perform(
+                put("/patient/note/api/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .accept(MediaType.ALL)).andReturn();
+
+        //Verify entry is not saved to DB, and we get bad request response (400)
+        assertTrue(mvcResult.getResponse().getStatus() == 400);
+        Mockito.verify(patientNoteRepository, Mockito.times(0)).save(any());
+
+    }
+
+    @Test
+    public void patientNoteControllerAPIDoesNotUpdateWithInvalidID() throws Exception {
+
+        //Create mock note with valid data
+        PatientNote note = new PatientNote();
+        note.setPatientNoteId("NOTEID");
+        note.setPatId("1");
+        note.setNote("NOTE");
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson=ow.writeValueAsString(note);
+
+        //When our service accepts the PatientNote JSON and asks the repo for patient with id NOTEID
+        //We want to simulate not finding a note, so we omit patientRepository thenReturn line
+
+        //Attempt to update note
+        MvcResult mvcResult = mockMvc.perform(
+                put("/patient/note/api/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                        .accept(MediaType.ALL)).andReturn();
+
+        //Verify entry is not saved to DB, and we get not found response (404)
+        assertTrue(mvcResult.getResponse().getStatus() == 404);
+        Mockito.verify(patientNoteRepository, Mockito.times(0)).save(any());
 
     }
 
