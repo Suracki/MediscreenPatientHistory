@@ -52,6 +52,19 @@ public class PatientNoteController {
         return patientNoteService.viewByPatientId(id, model);
     }
 
+    @GetMapping("/patient/note/update/{id}")
+    public String showUpdateForm(@PathVariable("id") String id, Model model) {
+        logger.info("User connected to /patient/note/update/ GET endpoint for patient with id " + id);
+        return patientNoteService.showUpdateForm(id, model);
+    }
+
+    @PostMapping("/patient/note/update/{id}")
+    public String updateRuleName(@PathVariable("id") String id, @Valid PatientNote patientNote,
+                                 BindingResult result, Model model) {
+        logger.info("User connected to /patient/note/update/ POST endpoint for patient with id " + id);
+        return patientNoteService.update(id, patientNote, result, model);
+    }
+
     //Endpoints for serving REST API
     @PostMapping("/patient/note/api/add")
     public ResponseEntity<String> addPatientNoteApi(@Valid @RequestBody PatientNote patientNote, BindingResult result, Model model) {
@@ -69,6 +82,12 @@ public class PatientNoteController {
     public ResponseEntity<String> getAllOnePatientNotesApi(@PathVariable("patId") int patId, Model model) {
         logger.info("User connected to /patient/note/api/getbypatient endpoint with id " + patId);
         return patientNoteService.getFromApiByPatientId(patId, model);
+    }
+
+    @PutMapping("/patient/note/api/update")
+    public ResponseEntity<String> updatePatientApi(@Valid @RequestBody PatientNote patientNote, BindingResult result, Model model) {
+        logger.info("User connected to /patient/add endpoint");
+        return patientNoteService.updateFromApi(patientNote, result, model);
     }
 
 }
