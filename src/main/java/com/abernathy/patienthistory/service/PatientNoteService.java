@@ -97,6 +97,44 @@ public class PatientNoteService {
         return "patient/note/add";
     }
 
+    /**
+     * Method to get redirect for form to update existing PatientNote
+     * Verifies that privided ID does match a note in the repo
+     * Then returns url to update form
+     *
+     * @param id PatientNote's ID value
+     * @param model Model object
+     * @return url string
+     */
+    public String showUpdateForm(String id, Model model) {
+        PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote id:" + id));
+        model.addAttribute("patientNote", e);
+        return "patient/note/update";
+    }
+
+    /**
+     * Method to validate provided PatientNote
+     * Updates existing note in repo if valid & updates model
+     * Returns to update form if not valid
+     *
+     * @param id PatientNote's ID value
+     * @param e PatientNote with updated fields
+     * @param result BindingResult for validation
+     * @param model Model object
+     * @return url string
+     */
+    public String update(String id, PatientNote e,
+                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "patient/note/update";
+        }
+
+        e.setId(id);
+        repository.save(e);
+        model.addAttribute("patientNotes", repository.findAll());
+        return "redirect:/patient/note/list";
+    }
+
     //Methods to serve REST API requests
 
     /**
@@ -151,6 +189,35 @@ public class PatientNoteService {
         }
 
         return new ResponseEntity<String>("Failed to add new entry", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method to validate provided PatientNote received via put request
+     * Updates existing note in repo if valid & updates model
+     *
+     * @param e PatientNote with updated fields
+     * @param result BindingResult for validation
+     * @param model Model object
+     * @return ResponseEntity JSON of updated element and 200 if valid,
+     *         ResponseEntity JSON of requested update and 400 if invalid,
+     *         ResponseEntity JSON of requested update and 404 if ID not found in database,
+     */
+    public ResponseEntity<String> updateFromApi(PatientNote e,
+                                                BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            repository.findById(e.getId()).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + e.getId()));
+        }
+        catch (IllegalArgumentException error) {
+            return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+        }
+
+        repository.save(e);
+        model.addAttribute("patientNotes", repository.findAll());
+        return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
     }
 
 }
