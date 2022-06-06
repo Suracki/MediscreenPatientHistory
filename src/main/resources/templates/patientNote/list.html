@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8"/>
+	<title>Home</title>
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col-6">
+			<a href="/patient/note/list">Patient Note List</a>&nbsp;|&nbsp;
+		</div>
+	</div>
+	<div class="row"><h2>Patient Notes</h2></div>
+	<div class="row">
+		<a href="/patient/note/add" class="btn btn-primary btn-sm">Add New Note</a>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Note ID</th>
+					<th>Patient ID</th>
+				</tr>
+			</thead>
+			<tbody>
+			<tr th:each="patientNote : ${patientNotes}">
+				<td style="width: 10%" th:text="${patientNote.patientNoteId}"></td>
+				<td th:text="${patientNote.patId}"></td>
+				<td style="width: 15%" class="text-center">
+					<a th:href="@{/patient/note/view/{id}(id=${patientNote.patientNoteId})}">View</a>&nbsp;|
+					<a th:href="@{/patient/note/update/{id}(id=${patientNote.patientNoteId})}">Edit</a>&nbsp;|
+					<a th:href="@{/patient/note/viewall/{id}(id=${patientNote.patId})}">View All For Patient</a>&nbsp;
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+</body>
+</html>

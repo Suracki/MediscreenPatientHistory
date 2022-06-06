@@ -26,6 +26,20 @@ public class PatientNoteService {
     //Methods to serve Front End requests
 
     /**
+     * Method to populate Model for frontend
+     * Obtains all elements of this type from repository and adds to model
+     * Then returns redirect to list url
+     *
+     * @param model Model object to hold data loaded from repo
+     * @return redirect url String
+     */
+    public String home(Model model)
+    {
+        model.addAttribute("patientNotes", repository.findAll());
+        return "patientNote/list";
+    }
+
+    /**
      * Method to populate View Patient Note page
      * Obtains PatientNote with specific ID from repository and adds to model
      * Then returns redirect to view url
@@ -36,8 +50,22 @@ public class PatientNoteService {
      */
     public String view(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + id));
-        model.addAttribute("currentPatient", e);
+        model.addAttribute("currentPatientNote", e);
         return "patientNote/view";
+    }
+
+    /**
+     * Method to populate View Patient Note page
+     * Obtains PatientNote with specific ID from repository and adds to model
+     * Then returns redirect to view url
+     *
+     * @param id    id parameter of DomainElement
+     * @param model Model object to hold data loaded from repo
+     * @return url String
+     */
+    public String viewByPatientId(int id, Model model) {
+        model.addAttribute("thisPatientNotes", repository.findAllByPatId(id));
+        return "patientNote/viewall";
     }
 
     /**
