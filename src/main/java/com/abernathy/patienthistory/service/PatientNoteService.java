@@ -92,9 +92,9 @@ public class PatientNoteService {
         if (!result.hasErrors()) {
             repository.save(e);
             model.addAttribute("PatientNotes", repository.findAll());
-            return "redirect:/patientNote/list";
+            return "redirect:/patient/note/list";
         }
-        return "patientNote/add";
+        return "patient/note/add";
     }
 
     //Methods to serve REST API requests
