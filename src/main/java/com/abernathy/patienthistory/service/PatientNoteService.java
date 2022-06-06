@@ -132,7 +132,7 @@ public class PatientNoteService {
         e.setId(id);
         repository.save(e);
         model.addAttribute("patientNotes", repository.findAll());
-        return "redirect:/patientNote/list";
+        return "redirect:/patient/note/list";
     }
 
     //Methods to serve REST API requests
