@@ -95,16 +95,10 @@ public class PatientNoteService {
      * @return ResponseEntity JSON of PatientNotes for requested Patient ID and 200 if valid, 404 if no note found
      */
     public ResponseEntity<String> getFromApiByPatientId(int patId, Model model) {
-        List<Optional<PatientNote>> notes = repository.findAllByPatId(patId);
-        List<PatientNote> patientNotes = new ArrayList<>();
-        for (Optional<PatientNote> patientNote : notes) {
-            if (patientNote.isPresent()) {
-                patientNotes.add(patientNote.get());
-            }
-        }
-        if (patientNotes.size() > 0) {
+        List<PatientNote> notes = repository.findAllByPatId(patId);
+        if (notes.size() > 0) {
             // Notes found for provided patient ID
-            return new ResponseEntity<String>(patientNotes.toString(), new HttpHeaders(), HttpStatus.OK);
+            return new ResponseEntity<String>(notes.toString(), new HttpHeaders(), HttpStatus.OK);
         }
         else {
             // No notes for this patient in database
