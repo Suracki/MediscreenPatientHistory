@@ -94,7 +94,7 @@ public class PatientNoteService {
             model.addAttribute("PatientNotes", repository.findAll());
             return "redirect:/patient/note/list";
         }
-        return "patient/note/add";
+        return "patientNote/add";
     }
 
     /**
@@ -109,7 +109,7 @@ public class PatientNoteService {
     public String showUpdateForm(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote id:" + id));
         model.addAttribute("patientNote", e);
-        return "patient/note/update";
+        return "patientNote/update";
     }
 
     /**
@@ -126,13 +126,13 @@ public class PatientNoteService {
     public String update(String id, PatientNote e,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            return "patient/note/update";
+            return "patientNote/update";
         }
 
         e.setId(id);
         repository.save(e);
         model.addAttribute("patientNotes", repository.findAll());
-        return "redirect:/patient/note/list";
+        return "redirect:/patientNote/list";
     }
 
     //Methods to serve REST API requests

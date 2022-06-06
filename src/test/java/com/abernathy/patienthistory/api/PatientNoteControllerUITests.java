@@ -96,4 +96,45 @@ public class PatientNoteControllerUITests {
         assertTrue(mvcResult.getResponse().getStatus() == 200);
     }
 
+    @Test
+    public void patientNoteControllerGetUpdatePatientForm() throws Exception {
+
+        when(patientNoteRepository.findById("NOTEID")).thenReturn(java.util.Optional.of(new PatientNote()));
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/patient/note/update/NOTEID").accept(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+    }
+
+    @Test
+    public void patientNoteControllerPostUpdatesEntry() throws Exception {
+
+        when(patientNoteRepository.findById("NOTEID")).thenReturn(java.util.Optional.of(new PatientNote()));
+        MvcResult mvcResult = mockMvc.perform(
+                post("/patient/note/update/NOTEID")
+                        .param("patientNoteId", "NOTEID")
+                        .param("patId", "1")
+                        .param("note", "testnote")
+                        .accept(MediaType.ALL)).andReturn();
+
+        //Verify entry is updated in DB and we are redirected (302)
+        assertTrue(mvcResult.getResponse().getStatus() == 302);
+        Mockito.verify(patientNoteRepository, Mockito.times(1)).save(any(PatientNote.class));
+    }
+
+    @Test
+    public void patientNoteControllerPostDoesNotUpdateInvalidEntry() throws Exception {
+
+        when(patientNoteRepository.findById("NOTEID")).thenReturn(java.util.Optional.of(new PatientNote()));
+        MvcResult mvcResult = mockMvc.perform(
+                post("/patient/note/update/NOTEID")
+                        .param("patientNoteId", "NOTEID")
+                        .param("patId", "BADINPUT")
+                        .param("note", "testnote")
+                        .accept(MediaType.ALL)).andReturn();
+
+        //Verify entry is not updated in DB and we remain on form (200)
+        assertTrue(mvcResult.getResponse().getStatus() == 200);
+        Mockito.verify(patientNoteRepository, Mockito.times(0)).save(any(PatientNote.class));
+    }
+
 }
