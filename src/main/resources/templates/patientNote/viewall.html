@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Home</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <a href="/patient/note/list">Patient's Notes</a>&nbsp;|&nbsp;
+        </div>
+    </div>
+    <div class="row"><h2>Patient Notes</h2></div>
+    <div class="row">
+        <a href="/patient/note/add" class="btn btn-primary btn-sm">Add New Note</a>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Note ID</th>
+                <th>Note</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="note : ${thisPatientNotes}">
+                <td style="width: 10%" th:text="${note.patientNoteId}"></td>
+                <td th:text="${note.note}"></td>
+            </tr>
+            </tbody>
+
+        </table>
+        <div class="form-group">
+            <div class="col-sm-12">
+                <a class="btn btn-danger btn-sm" href="/patient/note/list">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
