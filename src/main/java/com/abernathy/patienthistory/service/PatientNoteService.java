@@ -1,10 +1,8 @@
 package com.abernathy.patienthistory.service;
 
-import com.abernathy.patienthistory.domain.DomainElement;
 import com.abernathy.patienthistory.domain.PatientNote;
 import com.abernathy.patienthistory.repository.PatientNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PatientNoteService {
@@ -218,6 +214,17 @@ public class PatientNoteService {
         repository.save(e);
         model.addAttribute("patientNotes", repository.findAll());
         return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    //Methods to serve RETROFIT API requests
+    /**
+     * Method to generate ResponseEntity for PatientNote get requests received via API
+     *
+     * @param patId Patient ID
+     * @return List<PatientNote> of PatientNotes for requested Patient ID
+     */
+    public List<PatientNote> getFromApiByPatientIdRetro(int patId) {
+        return repository.findAllByPatId(patId);
     }
 
 }
