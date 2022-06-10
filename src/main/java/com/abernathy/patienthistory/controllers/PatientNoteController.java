@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.validation.Valid;
 
@@ -20,6 +22,8 @@ public class PatientNoteController {
     PatientNoteService patientNoteService;
 
     private static final Logger logger = LogManager.getLogger("PatientNoteController");
+
+    private Gson gson = new GsonBuilder().create();
 
     //Endpoints for serving front end
     @RequestMapping("/patient/note/list")
@@ -88,6 +92,14 @@ public class PatientNoteController {
     public ResponseEntity<String> updatePatientApi(@Valid @RequestBody PatientNote patientNote, BindingResult result, Model model) {
         logger.info("User connected to /patient/add endpoint");
         return patientNoteService.updateFromApi(patientNote, result, model);
+    }
+
+    //Endpoints for serving Retrofit calls
+    @GetMapping("/patient/note/api/retro/getbypatient/{id}")
+    @ResponseBody
+    public String getAllOnePatientNotesRetro(@PathVariable("id") int id) {
+        logger.info("User connected to patient/note/api/retro/getbypatient/ endpoint with id " + id);
+        return gson.toJson(patientNoteService.getFromApiByPatientIdRetro(id));
     }
 
 }
