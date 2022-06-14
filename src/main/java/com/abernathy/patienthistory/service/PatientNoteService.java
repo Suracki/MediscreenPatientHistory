@@ -3,6 +3,7 @@ package com.abernathy.patienthistory.service;
 import com.abernathy.patienthistory.domain.PatientNote;
 import com.abernathy.patienthistory.repository.PatientNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ public class PatientNoteService {
     @Autowired
     private PatientNoteRepository repository;
 
+    @Value("${docker.patient.url}")
+    private String urlPat;
+
     //Methods to serve Front End requests
 
     /**
@@ -32,6 +36,7 @@ public class PatientNoteService {
     public String home(Model model)
     {
         model.addAttribute("patientNotes", repository.findAll());
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/list";
     }
 
@@ -47,6 +52,7 @@ public class PatientNoteService {
     public String view(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + id));
         model.addAttribute("currentPatientNote", e);
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/view";
     }
 
@@ -61,6 +67,7 @@ public class PatientNoteService {
      */
     public String viewByPatientId(int id, Model model) {
         model.addAttribute("thisPatientNotes", repository.findAllByPatId(id));
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/viewall";
     }
 
@@ -88,6 +95,7 @@ public class PatientNoteService {
         if (!result.hasErrors()) {
             repository.save(e);
             model.addAttribute("PatientNotes", repository.findAll());
+            model.addAttribute("urlPat", urlPat);
             return "redirect:/patient/note/list";
         }
         return "patientNote/add";
@@ -105,6 +113,7 @@ public class PatientNoteService {
     public String showUpdateForm(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote id:" + id));
         model.addAttribute("patientNote", e);
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/update";
     }
 
@@ -128,6 +137,7 @@ public class PatientNoteService {
         e.setId(id);
         repository.save(e);
         model.addAttribute("patientNotes", repository.findAll());
+        model.addAttribute("urlPat", urlPat);
         return "redirect:/patient/note/list";
     }
 
