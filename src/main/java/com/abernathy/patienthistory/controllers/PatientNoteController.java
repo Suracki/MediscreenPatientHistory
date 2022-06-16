@@ -34,9 +34,9 @@ public class PatientNoteController {
     }
 
     @GetMapping("/patient/note/add")
-    public String addPatientNote(PatientNote patientNote) {
+    public String addPatientNote(PatientNote patientNote, Model model) {
         logger.info("User connected to /patient/note/add endpoint");
-        return patientNoteService.addForm(patientNote);
+        return patientNoteService.addForm(patientNote, model);
     }
 
     @PostMapping("/patient/note/validate")

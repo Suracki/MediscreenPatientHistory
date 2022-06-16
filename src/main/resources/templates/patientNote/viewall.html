@@ -16,7 +16,7 @@
     </div>
     <div class="row"><h2>Patient Notes</h2></div>
     <div class="row">
-        <a href="@{/patient/note/add}" class="btn btn-primary btn-sm">Add New Note</a>
+        <a th:href="@{/patient/note/add}" class="btn btn-primary btn-sm">Add New Note</a>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -32,14 +32,11 @@
             </tbody>
 
         </table>
-        <div class="form-group">
-            <div class="col-sm-12">
+
+            <div class="row-sm-12">
                 <a class="btn btn-danger btn-sm" href="/patient/note/list">Back to Patient Notes</a>
-            </div>
-            <div class="col-sm-12">
                 <a class="btn btn-danger btn-sm" th:href="@{http://{url}/patient/list(url=${urlPat})}">Back to Patients</a>
             </div>
-        </div>
     </div>
 </div>
 </body>

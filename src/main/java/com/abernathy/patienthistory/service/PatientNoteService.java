@@ -1,6 +1,7 @@
 package com.abernathy.patienthistory.service;
 
 import com.abernathy.patienthistory.domain.PatientNote;
+import com.abernathy.patienthistory.remote.PatientRemote;
 import com.abernathy.patienthistory.repository.PatientNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,13 +13,18 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PatientNoteService {
 
     @Autowired
     private PatientNoteRepository repository;
+
+    @Autowired
+    private PatientRemote patientRemote;
 
     @Value("${docker.patient.url}")
     private String urlPat;
@@ -77,7 +83,12 @@ public class PatientNoteService {
      * @param e PatientNote object of type to be added
      * @return url String
      */
-    public String addForm(PatientNote e) {
+    public String addForm(PatientNote e, Model model) {
+        Map<Integer, String> patientIndex = patientRemote.getPatientIndex();
+        List<Integer> keys = new ArrayList<>();
+        keys.addAll(patientIndex.keySet());
+        model.addAttribute("keys", keys);
+        model.addAttribute("patIdAndName", patientRemote.getPatientIndex());
         return "patientNote/add";
     }
 
@@ -93,11 +104,18 @@ public class PatientNoteService {
      */
     public String validate(@Valid PatientNote e, BindingResult result, Model model) {
         if (!result.hasErrors()) {
+            System.out.println("Errors found: " + result.toString());
             repository.save(e);
             model.addAttribute("PatientNotes", repository.findAll());
             model.addAttribute("urlPat", urlPat);
             return "redirect:/patient/note/list";
         }
+
+        Map<Integer, String> patientIndex = patientRemote.getPatientIndex();
+        List<Integer> keys = new ArrayList<>();
+        keys.addAll(patientIndex.keySet());
+        model.addAttribute("keys", keys);
+        model.addAttribute("patIdAndName", patientRemote.getPatientIndex());
         return "patientNote/add";
     }
 
