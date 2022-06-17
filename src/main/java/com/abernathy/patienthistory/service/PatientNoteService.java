@@ -165,10 +165,9 @@ public class PatientNoteService {
      * Method to generate ResponseEntity for PatientNote get requests received via API
      *
      * @param id    id parameter of PatientNote
-     * @param model Model object to hold data loaded from repo
      * @return ResponseEntity JSON of requested PatientNote and 200 if valid, 404 if invalid
      */
-    public ResponseEntity<String> getFromApi(String id, Model model) {
+    public ResponseEntity<String> getFromApi(String id) {
         try {
             PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + id));
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
@@ -181,10 +180,9 @@ public class PatientNoteService {
      * Method to generate ResponseEntity for PatientNote get requests received via API
      *
      * @param patId Patient ID
-     * @param model Model object to hold data loaded from repo
      * @return ResponseEntity JSON of PatientNotes for requested Patient ID and 200 if valid, 404 if no note found
      */
-    public ResponseEntity<String> getFromApiByPatientId(int patId, Model model) {
+    public ResponseEntity<String> getFromApiByPatientId(int patId) {
         List<PatientNote> notes = repository.findAllByPatId(patId);
         if (notes.size() > 0) {
             // Notes found for provided patient ID
@@ -202,13 +200,11 @@ public class PatientNoteService {
      *
      * @param e      PatientNote object to be added
      * @param result BindingResult for validation
-     * @param model  Model object
      * @return ResponseEntity JSON of added PatientNote and 201 if valid, 400 if invalid
      */
-    public ResponseEntity<String> addFromApi(PatientNote e, BindingResult result, Model model) {
+    public ResponseEntity<String> addFromApi(PatientNote e, BindingResult result) {
         if (!result.hasErrors()) {
             repository.save(e);
-            model.addAttribute("PatientNotes", repository.findAll());
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.CREATED);
         }
 
@@ -221,13 +217,12 @@ public class PatientNoteService {
      *
      * @param e PatientNote with updated fields
      * @param result BindingResult for validation
-     * @param model Model object
      * @return ResponseEntity JSON of updated element and 200 if valid,
      *         ResponseEntity JSON of requested update and 400 if invalid,
      *         ResponseEntity JSON of requested update and 404 if ID not found in database,
      */
     public ResponseEntity<String> updateFromApi(PatientNote e,
-                                                BindingResult result, Model model) {
+                                                BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
@@ -240,11 +235,11 @@ public class PatientNoteService {
         }
 
         repository.save(e);
-        model.addAttribute("patientNotes", repository.findAll());
         return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
     }
 
     //Methods to serve RETROFIT API requests
+
     /**
      * Method to generate ResponseEntity for PatientNote get requests received via API
      *

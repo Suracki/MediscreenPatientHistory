@@ -28,6 +28,12 @@ public class PatientRemote {
 
     private Gson gson = new GsonBuilder().setLenient().create();
 
+    /**
+     * Method to get index of patients from patient database via api call
+     * For use in add patient note front end ui
+     *
+     * @return Map of Patient ID to Patient Names
+     */
     public Map<Integer, String> getPatientIndex() {
         logger.info("getPatientIndex called");
 
