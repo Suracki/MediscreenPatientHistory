@@ -193,8 +193,6 @@ public class PatientNoteController {
     /**
      * Mapping for PUT
      *
-     * Takes a Patient ID, returns all PatientNotes for that Patient
-     *
      * Returns:
      * HttpStatus.NOT_FOUND if note does not exist with this ID
      * HttpStatus.BAD_REQUEST if note has errors
