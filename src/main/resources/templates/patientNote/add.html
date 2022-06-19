@@ -4,11 +4,16 @@
 <head>
 	<meta charset="utf-8"/>
 	<title>Add Patient Note</title>
-	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+	<link rel="stylesheet" href="/css/bootstrap.min.css" >
 </head>
 <body>
 <div class="container">
-
+	<div class="row">
+		<div class="col-6">
+			<a th:href="@{http://{url}/patient/list(url=${urlPat})}">Patient List</a>&nbsp;|&nbsp;
+			<a href="/patient/note/list">Patient Notes</a>
+		</div>
+	</div>
 	<div class="row">
 		<h2>Add Patient Note</h2>
 	</div>
