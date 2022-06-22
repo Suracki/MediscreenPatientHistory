@@ -1,10 +1,10 @@
 package com.abernathy.patienthistory.service;
 
-import com.abernathy.patienthistory.domain.DomainElement;
 import com.abernathy.patienthistory.domain.PatientNote;
+import com.abernathy.patienthistory.remote.PatientRemote;
 import com.abernathy.patienthistory.repository.PatientNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +15,19 @@ import org.springframework.validation.BindingResult;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @Service
 public class PatientNoteService {
 
     @Autowired
     private PatientNoteRepository repository;
+
+    @Autowired
+    private PatientRemote patientRemote;
+
+    @Value("${docker.patient.url}")
+    private String urlPat;
 
     //Methods to serve Front End requests
 
@@ -36,6 +42,7 @@ public class PatientNoteService {
     public String home(Model model)
     {
         model.addAttribute("patientNotes", repository.findAll());
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/list";
     }
 
@@ -51,6 +58,7 @@ public class PatientNoteService {
     public String view(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + id));
         model.addAttribute("currentPatientNote", e);
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/view";
     }
 
@@ -65,6 +73,7 @@ public class PatientNoteService {
      */
     public String viewByPatientId(int id, Model model) {
         model.addAttribute("thisPatientNotes", repository.findAllByPatId(id));
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/viewall";
     }
 
@@ -74,7 +83,12 @@ public class PatientNoteService {
      * @param e PatientNote object of type to be added
      * @return url String
      */
-    public String addForm(PatientNote e) {
+    public String addForm(PatientNote e, Model model) {
+        Map<Integer, String> patientIndex = patientRemote.getPatientIndex();
+        List<Integer> keys = new ArrayList<>();
+        keys.addAll(patientIndex.keySet());
+        model.addAttribute("keys", keys);
+        model.addAttribute("patIdAndName", patientRemote.getPatientIndex());
         return "patientNote/add";
     }
 
@@ -90,10 +104,18 @@ public class PatientNoteService {
      */
     public String validate(@Valid PatientNote e, BindingResult result, Model model) {
         if (!result.hasErrors()) {
+            System.out.println("Errors found: " + result.toString());
             repository.save(e);
             model.addAttribute("PatientNotes", repository.findAll());
+            model.addAttribute("urlPat", urlPat);
             return "redirect:/patient/note/list";
         }
+
+        Map<Integer, String> patientIndex = patientRemote.getPatientIndex();
+        List<Integer> keys = new ArrayList<>();
+        keys.addAll(patientIndex.keySet());
+        model.addAttribute("keys", keys);
+        model.addAttribute("patIdAndName", patientRemote.getPatientIndex());
         return "patientNote/add";
     }
 
@@ -109,6 +131,7 @@ public class PatientNoteService {
     public String showUpdateForm(String id, Model model) {
         PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote id:" + id));
         model.addAttribute("patientNote", e);
+        model.addAttribute("urlPat", urlPat);
         return "patientNote/update";
     }
 
@@ -132,6 +155,7 @@ public class PatientNoteService {
         e.setId(id);
         repository.save(e);
         model.addAttribute("patientNotes", repository.findAll());
+        model.addAttribute("urlPat", urlPat);
         return "redirect:/patient/note/list";
     }
 
@@ -141,10 +165,9 @@ public class PatientNoteService {
      * Method to generate ResponseEntity for PatientNote get requests received via API
      *
      * @param id    id parameter of PatientNote
-     * @param model Model object to hold data loaded from repo
      * @return ResponseEntity JSON of requested PatientNote and 200 if valid, 404 if invalid
      */
-    public ResponseEntity<String> getFromApi(String id, Model model) {
+    public ResponseEntity<String> getFromApi(String id) {
         try {
             PatientNote e = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid PatientNote Id:" + id));
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
@@ -157,10 +180,9 @@ public class PatientNoteService {
      * Method to generate ResponseEntity for PatientNote get requests received via API
      *
      * @param patId Patient ID
-     * @param model Model object to hold data loaded from repo
      * @return ResponseEntity JSON of PatientNotes for requested Patient ID and 200 if valid, 404 if no note found
      */
-    public ResponseEntity<String> getFromApiByPatientId(int patId, Model model) {
+    public ResponseEntity<String> getFromApiByPatientId(int patId) {
         List<PatientNote> notes = repository.findAllByPatId(patId);
         if (notes.size() > 0) {
             // Notes found for provided patient ID
@@ -178,13 +200,11 @@ public class PatientNoteService {
      *
      * @param e      PatientNote object to be added
      * @param result BindingResult for validation
-     * @param model  Model object
      * @return ResponseEntity JSON of added PatientNote and 201 if valid, 400 if invalid
      */
-    public ResponseEntity<String> addFromApi(PatientNote e, BindingResult result, Model model) {
+    public ResponseEntity<String> addFromApi(PatientNote e, BindingResult result) {
         if (!result.hasErrors()) {
             repository.save(e);
-            model.addAttribute("PatientNotes", repository.findAll());
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.CREATED);
         }
 
@@ -197,13 +217,12 @@ public class PatientNoteService {
      *
      * @param e PatientNote with updated fields
      * @param result BindingResult for validation
-     * @param model Model object
      * @return ResponseEntity JSON of updated element and 200 if valid,
      *         ResponseEntity JSON of requested update and 400 if invalid,
      *         ResponseEntity JSON of requested update and 404 if ID not found in database,
      */
     public ResponseEntity<String> updateFromApi(PatientNote e,
-                                                BindingResult result, Model model) {
+                                                BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
@@ -216,8 +235,19 @@ public class PatientNoteService {
         }
 
         repository.save(e);
-        model.addAttribute("patientNotes", repository.findAll());
         return new ResponseEntity<String>(e.toString(), new HttpHeaders(), HttpStatus.OK);
+    }
+
+    //Methods to serve RETROFIT API requests
+
+    /**
+     * Method to generate ResponseEntity for PatientNote get requests received via API
+     *
+     * @param patId Patient ID
+     * @return List<PatientNote> of PatientNotes for requested Patient ID
+     */
+    public List<PatientNote> getFromApiByPatientIdRetro(int patId) {
+        return repository.findAllByPatId(patId);
     }
 
 }

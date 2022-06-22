@@ -3,19 +3,20 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <title>Home</title>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
+    <title>View Patient Notes</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" >
 </head>
 <body>
 <div class="container">
     <div class="row">
         <div class="col-6">
-            <a href="/patient/note/list">Patient's Notes</a>&nbsp;|&nbsp;
+            <a th:href="@{http://{url}/patient/list(url=${urlPat})}">Patient List</a>&nbsp;|&nbsp;
+            <a href="/patient/note/list">Patient Notes</a>
         </div>
     </div>
     <div class="row"><h2>Patient Notes</h2></div>
     <div class="row">
-        <a href="/patient/note/add" class="btn btn-primary btn-sm">Add New Note</a>
+        <a th:href="@{/patient/note/add}" class="btn btn-primary btn-sm">Add New Note</a>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -31,11 +32,11 @@
             </tbody>
 
         </table>
-        <div class="form-group">
-            <div class="col-sm-12">
-                <a class="btn btn-danger btn-sm" href="/patient/note/list">Back</a>
+
+            <div class="row-sm-12">
+                <a class="btn btn-danger btn-sm" href="/patient/note/list">Back to Patient Notes</a>
+                <a class="btn btn-danger btn-sm" th:href="@{http://{url}/patient/list(url=${urlPat})}">Back to Patients</a>
             </div>
-        </div>
     </div>
 </div>
 </body>
